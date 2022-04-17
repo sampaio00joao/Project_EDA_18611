@@ -60,7 +60,7 @@ int main()
                         optionNode = 0;
                         printLinkedList(head);
                         printf("Choose the position: (Press 0 to cancel)");
-                        if (scanf("%d", &optionNode) > 0) {
+                        if (scanf("%d", &optionNode) > 0)
                             if (optionNode > 0) {
                                 printf("How many machines?.\n");
                                 if (scanf("%d", &qt) > 0) {
@@ -69,7 +69,6 @@ int main()
                                 }
                             }
                             else break;
-                        }
                         break;
                     }
                 }
@@ -79,12 +78,11 @@ int main()
                 system("cls");
                 printLinkedList(head);
                 printf("Choose the operation to delete.(Press 0 to go back)\n");
-                if (scanf("%d", &option_2) > 0) {
+                if (scanf("%d", &option_2) > 0)
                     if (option_2 > 0) {
                         deleteNode(&head, find_node(head, option_2));
                     }
                     else break;
-                }
                 break;
             case 3: // Modify an operation
                 system("cls");
@@ -93,46 +91,52 @@ int main()
                 option_2 = 0;
                 printf("Choose the operation you want to modify: (Press 0 to go back)\n");
                 if (scanf("%d", &option_2) > 0) {
-                    if(option_2 > 0){
+                    if (option_2 > 0) {
                         system("cls");
                         printf("1. Insert new machine\n");
                         printf("2. Remove an existing machine\n");
                         printf("3. Change the operation time from a machine\n");
-                        scanf("%d", &option);
-                        switch (option) {
-                        case 1: // Insert a machine to add
-                            printf("Machine to add to the operation: ");
-                            scanf("%d", &addMachine);
-                            printf("Machine operation time: ");
-                            scanf("%d", &addOpTime);
-                            modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
-                            break;
-                        case 2:
-                            // Remove a machine
-                            addMachine = 0;
-                            addOpTime = 0;
-                            modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
-                            break;
-                        case 3:
-                            // Modify the time from a machine
-                            addMachine = 0;
-                            addOpTime = 0;
-                            modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
-                            break;
-                        }//switch
+                        if (scanf("%d", &option) < 0)
+                            switch (option) {
+                            case 1: // Insert a machine to add
+                                printf("Machine to add to the operation: ");
+                                if (scanf("%d", &addMachine) > 0)
+                                    printf("Machine operation time: ");
+                                if (scanf("%d", &addOpTime) > 0)
+                                    modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
+                                break;
+                            case 2:
+                                // Remove a machine
+                                addMachine = 0;
+                                addOpTime = 0;
+                                modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
+                                break;
+                            case 3:
+                                // Modify the time from a machine
+                                addMachine = 0;
+                                addOpTime = 0;
+                                modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
+                                break;
+                            }//switch
                         break;
-                    }else break; // if the user presses 0 to go back.
+                    }
+                    else break; // if the user presses 0 to go back.
                 }
                 break;
             case 4: // save changes
-                option_2 = 1;
-                while (option_2 != 0) {
-                    writeFile(head);
-                    printf("Press 1 to go back.\n");
-                    if (scanf("%d", &option_2) > 0) option_2 = 0;
+                system("cls");
+                printf("Press 1 to confirm changes: (Press 0 to cancel)\n");
+                if (scanf("%d", &option_2) > 0) {
+                    if (option_2 != 0) {
+                        writeFile(head);
+                        printf("Saved Sucessfully!\n");
+                        printf("Press 0 to go back.\n");
+                        if (scanf("%d", &option_2) > 0) option_2 = 0;
+                    }
                 }
                 break;
             case 5: // print the linked list
+                system("cls");
                 option_2 = 1;
                 while (option_2 != 0) {
                     printLinkedList(head); // function call to print
@@ -141,6 +145,7 @@ int main()
                 }
                 break;
             case 6: // Max. Operation time
+                system("cls");
                 option_2 = 1;
                 while (option_2 != 0) {
                     printf("Maximum job time:\t%d\n", maximumOperationTime(head));
@@ -149,6 +154,7 @@ int main()
                 }
                 break;
             case 7: // Min. Operation time
+                system("cls");
                 option_2 = 1;
                 while (option_2 != 0) {
                     printf("Minimum job time:\t%d\n", minimumOperationTime(head));
@@ -157,6 +163,7 @@ int main()
                 }
                 break;
             case 8: // Avg. Operation time
+                system("cls");
                 option_2 = 1;
                 while (option_2 != 0) {
                     printf("Average job time:\t%d\n", averageOperationTime(head));
