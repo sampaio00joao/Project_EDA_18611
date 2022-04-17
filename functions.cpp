@@ -18,19 +18,28 @@ operation* createNode(int qt)
     
     for (int i = 0; i < qt; i++) {
         printf("Choose the machine to insert in the operation.\n");
-        scanf("%d", &inputMachine);
-        if (previousMachine == inputMachine) {
-            printf("Machine already in use!\n");
-            i--;
-        }else{
-            printf("Choose the time of operation of machine: %d\n", inputMachine);
-            scanf("%d", &inputOpTime);
-            // adds the new node to the linked list
-            node->machineNumber[i] = inputMachine;  // adds a machine
-            node->machineOperationTime[i] = inputOpTime; //adds a operation time for the machine
-            counter++;
-            node->counter = counter;
-            previousMachine = inputMachine; //update the previous machine to block if the same machine is chosen again
+        if (scanf("%d", &inputMachine) > 0) {
+            if (previousMachine == inputMachine) {
+                printf("Machine already in use!\n");
+                i--;
+            }
+            else {
+                printf("Choose the time of operation of machine: %d\n", inputMachine);
+                if (scanf("%d", &inputOpTime) > 0) {
+                    if(inputOpTime != 0) {
+                        // adds the new node to the linked list
+                        node->machineNumber[i] = inputMachine;  // adds a machine
+                        node->machineOperationTime[i] = inputOpTime; //adds a operation time for the machine
+                        counter++;
+                        node->counter = counter;
+                        previousMachine = inputMachine; //update the previous machine to block if the same machine is chosen again
+                    }
+                    else { 
+                        printf("Operation time cant be 0. Starting Over.\n"); 
+                        i--; 
+                    }
+                }
+            }
         }
     }
     return node;
@@ -91,16 +100,15 @@ operation* insertNodeList(operation** head, operation* node_to_insert, operation
 }
 
 void deleteNode(operation** head, operation* value) {
-    //temp is used for freeing memory
-    operation* temporary = (operation*)malloc(sizeof(operation));
-
+    
+    operation* temporary; //temporary is used to free the memory
     //key found on the head node.
     //move to head node to the next and free the head.
     if ((*head)->machineNumber == value->machineNumber)
     {
         temporary = *head;    //backup to free the memory
         *head = (*head)->next;
-        free(temporary);
+        free(temporary); // memory is free
     }
     else
     {
@@ -142,7 +150,7 @@ operation* find_node(operation* head, int position)
     return NULL;
 }
 
-void modifyOperation(operation** head, operation* nodeToModify, int addMachine, int addOpTime, int option) {
+void modifyOperation(operation** head, operation* nodeToModify, int addMachine, int addOpTime, int option){
 
     int bufferMachine[100];
     int bufferOpTime[100];
@@ -165,22 +173,23 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
         }
         counter = 0;
         printf("\n");
-        scanf("%d", &option);
-        while (counter < nodeToModify->counter) {
-            if (nodeToModify->machineNumber[counter] == option) {
-                bufferMachine[counter] = 0; // the machine to remove will have the value 0
-                bufferOpTime[counter] = 0; // value 0 on the operation time
+        if (scanf("%d", &option) > 0) {
+            while (counter < nodeToModify->counter) {
+                if (nodeToModify->machineNumber[counter] == option) {
+                    bufferMachine[counter] = 0; // the machine to remove will have the value 0
+                    bufferOpTime[counter] = 0; // value 0 on the operation time
+                }
+                else {
+                    bufferMachine[counter] = nodeToModify->machineNumber[counter]; // save the node in a buffer
+                    bufferOpTime[counter] = nodeToModify->machineOperationTime[counter]; // save the node in a buffer
+                }
+                counter++;
             }
-            else {
-                bufferMachine[counter] = nodeToModify->machineNumber[counter]; // save the node in a buffer
-                bufferOpTime[counter] = nodeToModify->machineOperationTime[counter]; // save the node in a buffer
-            }
-            counter++;
-        }
-        for (counter = 0; counter < nodeToModify->counter; counter++) {
-            if (bufferMachine[counter] != 0) { // rebuild the operation without the machine deleted
-                nodeToModify->machineNumber[counter] = bufferMachine[counter];
-                nodeToModify->machineOperationTime[counter] = bufferOpTime[counter];
+            for (counter = 0; counter < nodeToModify->counter; counter++) {
+                if (bufferMachine[counter] != 0) { // rebuild the operation without the machine deleted
+                    nodeToModify->machineNumber[counter] = bufferMachine[counter];
+                    nodeToModify->machineOperationTime[counter] = bufferOpTime[counter];
+                }
             }
         }
         nodeToModify->counter = counter-1; // decrease one number on the operation counter variable
@@ -197,12 +206,11 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
 
     case 3: // modify the operation time from a machine
         option = 0;
-
         for (i = 0; i < nodeToModify->counter; i++) {
             if (nodeToModify->machineNumber[i] == option) { // identify the machine chosen
                 printf("\nPrevious operation time: %d\n", nodeToModify->machineOperationTime[i]);
                 printf("New operation time: ");
-                scanf("%d", &option); // reutilizing the option variable
+                if(scanf("%d", &option) > 0) // reutilizing the option variable
                 nodeToModify->machineOperationTime[i] = option; // update the operation time of said machine
             }
             else if(option == 0){ // only choosing an available machine is permited
@@ -214,7 +222,7 @@ void modifyOperation(operation** head, operation* nodeToModify, int addMachine, 
                 counter = 0;
                 option = 0;
                 printf("\n");
-                scanf("%d", &option); // user input
+                if(scanf("%d", &option) > 0) // user input
                 i--;
             }
         }

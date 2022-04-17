@@ -37,11 +37,11 @@ int main()
                 printf("2. Insert at the head of the list.\n");
                 printf("3. Insert on a specified position.\n");
                 if (scanf("%d", &optionNode) > 0) {
-
                     switch (optionNode) {
                     case 0:
                         break;
                     case 1:
+                        system("cls");
                         printf("How many machines?.\n");
                         if (scanf("%d", &qt) > 0) {
                             temporary = createNode(qt);
@@ -49,6 +49,7 @@ int main()
                         }
                         break;
                     case 2:
+                        system("cls");
                         printf("How many machines?.\n");
                         if (scanf("%d", &qt) > 0) {
                             temporary = createNode(qt);
@@ -59,16 +60,18 @@ int main()
                         system("cls");
                         optionNode = 0;
                         printLinkedList(head);
-                        printf("Choose the position: (Press 0 to cancel)");
-                        if (scanf("%d", &optionNode) > 0)
+                        printf("Choose the position: (Press 0 to cancel)\n");
+                        if (scanf("%d", &optionNode) > 0) {
                             if (optionNode > 0) {
+                                system("cls");
                                 printf("How many machines?.\n");
                                 if (scanf("%d", &qt) > 0) {
                                     temporary = createNode(qt);
                                     insertNodeList(&head, temporary, find_node(head, optionNode - 1)); // -1 because otherwise it would place in the following node
                                 }
                             }
-                            else break;
+                        }
+                        else break;
                         break;
                     }
                 }
@@ -91,7 +94,13 @@ int main()
                 option_2 = 0;
                 printf("Choose the operation you want to modify: (Press 0 to go back)\n");
                 if (scanf("%d", &option_2) > 0) {
-                    if (option_2 > 0) {
+                    temporary = head;
+                    while (temporary != NULL) { // used to restrict the user from choosing an operation that doenst exist
+                        counterOperation++;
+                        temporary = temporary->next;
+                    }
+                    if (option_2 != 0 && option_2 < counterOperation) {
+                        counterOperation = 0;
                         system("cls");
                         printf("1. Insert new machine\n");
                         printf("2. Remove an existing machine\n");
@@ -120,7 +129,7 @@ int main()
                             }//switch
                         break;
                     }
-                    else break; // if the user presses 0 to go back.
+                    else break; // if the user presses 0 to go back, or the wrong number is choosen.
                 }
                 break;
             case 4: // save changes
