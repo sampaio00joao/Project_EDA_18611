@@ -5,16 +5,17 @@
 
 int main()
 {
-    int option, machineNumber[5], machineOpTime[5], option_2;
+    int option = 0, option_2 = 0;
     int receiveMaxOpTime;
     int addMachine = 0, addOpTime = 0; // modify
     int qt = 0;
     int counterOperation = 0; // print the values available for deletion
     int optionNode = 0;
+    int counter = 0;
 
     operation* temporary;
     operation* head = NULL; // Linked list 
-    readFile(&head); // load the table
+    readFile(&head); // load the values from the file
 
     while (1) { // infinite cycle
         printf("Main Menu: (one job)\n");
@@ -27,7 +28,7 @@ int main()
         printf("7. Minimum operating time (for one job)\n");
         printf("8. Average operating time (for one job)\n");
 
-        if (scanf("%d", &option) > 0) {
+       if (scanf("%d", &option) > 0) {
             switch (option) {
             case 0: break;
             case 1: // create node 
@@ -44,16 +45,16 @@ int main()
                         system("cls");
                         printf("How many machines?.\n");
                         if (scanf("%d", &qt) > 0) {
-                            temporary = createNode(qt);
-                            insertNodeList(&head, temporary, NULL);
+                            temporary = createNode(qt); // creates the node
+                            insertNodeList(&head, temporary, NULL); // inserts the node on the list / last position
                         }
                         break;
                     case 2:
                         system("cls");
                         printf("How many machines?.\n");
                         if (scanf("%d", &qt) > 0) {
-                            temporary = createNode(qt);
-                            insertAtHead(&head, temporary);
+                            temporary = createNode(qt); // creates the node
+                            insertAtHead(&head, temporary); // inserts the node on the list / first position
                         }
                         break;
                     case 3:
@@ -66,7 +67,7 @@ int main()
                                 system("cls");
                                 printf("How many machines?.\n");
                                 if (scanf("%d", &qt) > 0) {
-                                    temporary = createNode(qt);
+                                    temporary = createNode(qt); // creates the node
                                     insertNodeList(&head, temporary, find_node(head, optionNode - 1)); // -1 because otherwise it would place in the following node
                                 }
                             }
@@ -83,7 +84,16 @@ int main()
                 printf("Choose the operation to delete.(Press 0 to go back)\n");
                 if (scanf("%d", &option_2) > 0)
                     if (option_2 > 0) {
-                        deleteNode(&head, find_node(head, option_2));
+                        temporary = head;
+                        while (temporary != NULL) { // used to restrict the user from choosing an operation that doenst exist
+                            counterOperation++; // counts how many operations there are
+                            temporary = temporary->next;
+                        }
+                        if (option_2 != 0 && option_2 <= counterOperation) { // if the value isnt 0 or higher than the valid operations
+                        // as the node paramater in the deleteNode function, i use the return of the finfNode function
+                        // which corresponds to the node chosen by the user
+                            deleteNode(&head, find_node(head, option_2));
+                        }
                     }
                     else break;
                 break;
@@ -96,38 +106,47 @@ int main()
                 if (scanf("%d", &option_2) > 0) {
                     temporary = head;
                     while (temporary != NULL) { // used to restrict the user from choosing an operation that doenst exist
-                        counterOperation++;
+                        counterOperation++; // counts how many operations there are
                         temporary = temporary->next;
                     }
-                    if (option_2 != 0 && option_2 < counterOperation) {
-                        counterOperation = 0;
+                    if (option_2 != 0 && option_2 <= counterOperation) { // if the value isnt 0 or higher than the valid operations
+                        option = 0;
                         system("cls");
                         printf("1. Insert new machine\n");
                         printf("2. Remove an existing machine\n");
                         printf("3. Change the operation time from a machine\n");
-                        if (scanf("%d", &option) < 0)
-                            switch (option) {
-                            case 1: // Insert a machine to add
-                                printf("Machine to add to the operation: ");
-                                if (scanf("%d", &addMachine) > 0)
+                        printf("(Press 0 to cancel)\n");
+                        if (scanf("%d", &option) > 0){
+                            if (option < counterOperation) {
+                                switch (option) {
+                                case 0: break; // back to menu
+                                case 1: // Insert a machine to add
+                                    printf("Machine to add to the operation: ");
+                                    if (scanf("%d", &addMachine) > 0)
                                     printf("Machine operation time: ");
-                                if (scanf("%d", &addOpTime) > 0)
+                                    if (scanf("%d", &addOpTime) > 0)
+                                        // sends as parameters the head, the node the user wants and the variables to update the operation
+                                        modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
+                                    break;
+                                case 2:
+                                    // Remove a machine
+                                    addMachine = 0;
+                                    addOpTime = 0;
+                                    // sends as parameters the head, the node the user wants and the variables to update the operation
                                     modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
+                                    break;
+                                case 3:
+                                    // Modify the time from a machine
+                                    addMachine = 0;
+                                    addOpTime = 0;
+                                    // sends as parameters the head, the node the user wants and the variables to update the operation
+                                    modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
+                                    break;
+                                }//switch
                                 break;
-                            case 2:
-                                // Remove a machine
-                                addMachine = 0;
-                                addOpTime = 0;
-                                modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
-                                break;
-                            case 3:
-                                // Modify the time from a machine
-                                addMachine = 0;
-                                addOpTime = 0;
-                                modifyOperation(&head, find_node(head, option_2), addMachine, addOpTime, option);
-                                break;
-                            }//switch
-                        break;
+                            }
+                        }
+                        counterOperation = 0;
                     }
                     else break; // if the user presses 0 to go back, or the wrong number is choosen.
                 }
@@ -136,7 +155,7 @@ int main()
                 system("cls");
                 printf("Press 1 to confirm changes: (Press 0 to cancel)\n");
                 if (scanf("%d", &option_2) > 0) {
-                    if (option_2 != 0) {
+                    if (option_2 != 0) { // confirmation
                         writeFile(head);
                         printf("Saved Sucessfully!\n");
                         printf("Press 0 to go back.\n");
