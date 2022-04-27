@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "functions.h"
 
+
 int main()
 {
     int option = 0, option_2 = 0;
@@ -15,7 +16,8 @@ int main()
 
     operation* temporary;
     operation* head = NULL; // Linked list 
-    readFile(&head); // load the values from the file
+    job* headJob = NULL; // Linked list 
+    readFile(&headJob, &head); // load the values from the file
 
     while (1) { // infinite cycle
         printf("Main Menu: (one job)\n");
@@ -167,7 +169,7 @@ int main()
                 system("cls");
                 option_2 = 1;
                 while (option_2 != 0) {
-                    printLinkedList(head); // function call to print
+                    printLinkedListJob(headJob, head); // function call to print
                     printf("(Press 0 to go back)\n");
                     if (scanf("%d", &option_2) > 0) option_2 = 0;
                 }

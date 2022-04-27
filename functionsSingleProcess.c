@@ -251,42 +251,18 @@ void printLinkedList(operation* head)
     operation* temporary = head;
     int counter = 0;
     int i = 0;
-
+    //printf("Process %d:\n", counter);
     while (temporary != NULL)
     { // while its not at the end of the list
         counter++; // used to show what is the actual operation
-        printf("Operation %d:\n", counter);
+        printf("\tOperation %d:\n", counter);
         for (int i = 0; i < temporary->counter; i++) { // prints all the machines of the list
-            printf("\tMachine: %d \n", temporary->machineNumber[i]);
-            printf("\tOperation Time: %d \n", temporary->machineOperationTime[i]);
+            printf("\t\tMachine: %d \n", temporary->machineNumber[i]);
+            printf("\t\tOperation Time: %d \n", temporary->machineOperationTime[i]);
         }
         temporary = temporary->next;
     }
     printf("\n");
-}
-
-void writeFile(operation* head) {
-
-    int counter = 0;
-    operation* temporary = head; // access the data from the linked list 
-
-    FILE* file = fopen("saveSystem.txt", "w"); // open file in writing mode
-    if (file == NULL) {
-        printf("Cannot open file."); // error if it fails to open
-    }
-
-    while (temporary != NULL) {
-        counter++; // for printing purposes
-        fprintf(file, "%d ", temporary->counter); // used as a reference when reading
-        for (int i = 0; i < temporary->counter; i++) {
-            // prints all the machines and their operation time inside every operation/node
-            fprintf(file, "%d ", temporary->machineNumber[i]);
-            fprintf(file, "%d ", temporary->machineOperationTime[i]);
-        }
-        fprintf(file, "\n", '\n');
-        temporary = temporary->next; // continues through the list
-    }
-    fclose(file); // closes the file in the end
 }
 
 int maximumOperationTime(operation* head) {
@@ -342,34 +318,112 @@ int averageOperationTime(operation* head) {
     return(sum);
 }
 
-operation* readFile(operation** head) {
-    int saveValue = 0;
+void writeFile(operation* head) {
+
+    int counter = 0;
+    operation* temporary = head; // access the data from the linked list 
+
+    FILE* file = fopen("saveSystem.txt", "w"); // open file in writing mode
+    if (file == NULL) {
+        printf("Cannot open file."); // error if it fails to open
+    }
+
+    while (temporary != NULL) {
+        counter++; // for printing purposes
+        fprintf(file, "%d ", temporary->counter); // used as a reference when reading
+        for (int i = 0; i < temporary->counter; i++) {
+            // prints all the machines and their operation time inside every operation/node
+            fprintf(file, "%d ", temporary->machineNumber[i]);
+            fprintf(file, "%d ", temporary->machineOperationTime[i]);
+        }
+        fprintf(file, "\n", '\n');
+        temporary = temporary->next; // continues through the list
+    }
+    fclose(file); // closes the file in the end
+}
+
+operation* readFile(job** headJob, operation** head) {
+    int saveAmountMachine = 0, saveJobNum = 0;
     operation* temporary = (operation*)malloc(sizeof(operation));
-    operation* createOp; // to record the data on the list
+    operation* createOp; // to record the data on the list / single job
+    job* createPro; // to record the data on the list / multiple jobs
+    int blockNewJob = 1; // job one
 
     FILE* file = fopen("saveSystem.txt", "r");
     if (file == NULL) {
         printf("Cannot open file.");
     }
     if (file != 0) { // safety
-        while (!feof(file)) {
-            // reads the counter variable to know how many machines machines are in the operation
-            fscanf(file, "%d ", &saveValue);
-            // allocating space
-            temporary->valueReadMachine = (int*)malloc(sizeof(int) * saveValue);
-            temporary->valueReadOpTime = (int*)malloc(sizeof(int) * saveValue);
-            for (int i = 0; i < saveValue; i++) { // loops the amount of times needed to fill the operation
-                fscanf(file, "%d ", &temporary->valueReadMachine[i]);
-                fscanf(file, "%d ", &temporary->valueReadOpTime[i]);
+        while (!feof(file)) { // until the end of the file
+            if(fscanf(file, "%d", &saveJobNum)>0);
+            if (saveJobNum != 0) {
+                // reads the counter variable to know how many machines machines are in the operation
+                if (fscanf(file, "%d ", &saveAmountMachine) > 0);
+                // allocating space
+                temporary->valueReadMachine = (int*)malloc(sizeof(int) * saveAmountMachine);
+                temporary->valueReadOpTime = (int*)malloc(sizeof(int) * saveAmountMachine);
+                for (int i = 0; i < saveAmountMachine; i++) { // loops the amount of times needed to fill the operation
+                    fscanf(file, "%d ", &temporary->valueReadMachine[i]);
+                    fscanf(file, "%d ", &temporary->valueReadOpTime[i]);
+                }
+                // calls the function to create the list, with all the values and the counter
+                createOp = createNodeFile(head, temporary->valueReadMachine, temporary->valueReadOpTime, saveAmountMachine);
+                *head = insertNodeList(head, createOp, NULL);
+                createOp->operationNumber++; // count the operations
+                createOp->next = NULL;
             }
-            // calls the function to create the list, with all the values and the counter
-            createOp = createNodeFile(head, temporary->valueReadMachine, temporary->valueReadOpTime, saveValue);
-            *head = insertNodeList(head, createOp, NULL);
-            createOp->next = NULL;
+            else {
+                // create new job when the previous is finished
+                blockNewJob++; // blocks the program so it cant create another job until the value changes
+                createPro = createNodeJob(headJob, head, saveJobNum);
+                *headJob = insertNodeListJob(headJob, head, NULL);
+                createPro->next = NULL;
+            }
         }
     }
     free(temporary->valueReadMachine);
     free(temporary->valueReadOpTime);
     fclose(file);
     return *head;
+}
+
+// jobs
+job* createNodeJob(job** headProcess, operation* head, int processNumber)
+{
+    job* node = (operation*)malloc(sizeof(operation));
+    //node->processNumber = processNumber;
+    node->previous = head;
+    return node;
+} // createNode
+
+job* insertNodeListJob(job** headProcess, job* node_to_insert, job* position) {
+    operation* lastNode = *headProcess; // the last node points to the head of the list
+
+    if (*headProcess == NULL) { // if the list doesnt have anything yet
+        *headProcess = node_to_insert->previous; // add that value to the head of the list
+    }
+    else if (position != NULL) { //insert node after node in the chosen position
+        // shifts the value on the desired position one position to the right, and inserts the new node
+        node_to_insert->next = position->next;
+        position->next = node_to_insert;
+        return node_to_insert;
+    }
+    else { // if the list already as one value / and no position was specified
+        while (lastNode->next != NULL) { // goes through all the list
+            lastNode = lastNode->next;
+        }
+        // until it reaches the end and puts the value on the last position of the list
+        lastNode->next = node_to_insert;
+        node_to_insert->next = NULL; // the next element is NULL / end of the list
+    }
+    return *headProcess; // returns after adding the new node to the list
+}
+
+void printLinkedListJob(job* headJob, operation* head) {
+    job* temporary = headJob; // points to the head of the jobs linked list
+    while (temporary != NULL) { // goes through the list
+        printf("Job %d:\n", temporary->processNumber+1);
+        printLinkedList(head); // print all the job contents
+        temporary = temporary->next;
+    }
 }

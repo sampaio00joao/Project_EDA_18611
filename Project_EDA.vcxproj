@@ -145,7 +145,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
-    <ClInclude Include="functionsMultProcess.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="saveSystem.txt" />

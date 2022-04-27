@@ -2,9 +2,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+typedef struct job
+{
+    int processNumber;
+    struct process* next; // next position on the list
+    struct process* previous; // previous position on the list
+}job;
+
 typedef struct operation
 {
     // used on the file reading process
+    int operationNumber;
     int* valueReadMachine; 
     int* valueReadOpTime;
     int counter; // to count the number of machines inside an operation
@@ -39,4 +47,12 @@ void printLinkedList(operation* head);
 // updates the file
 void writeFile(operation* head);
 // brings all the data from the file
-operation* readFile(operation** head);
+operation* readFile(job** headJob, operation** head);
+
+//JOBS
+job* createNodeJob(job** headProcess, operation* head, int processNumber);
+
+job* insertNodeListJob(job** headProcess, job* node_to_insert, job* position);
+
+void printLinkedListJob(job* headJob, operation* head);
+
