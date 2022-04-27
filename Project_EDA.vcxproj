@@ -139,11 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="functions.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="functionsMultProcess.c" />
+    <ClCompile Include="functionsSingleProcess.c" />
+    <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
+    <ClInclude Include="functionsMultProcess.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="saveSystem.txt" />
